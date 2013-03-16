@@ -15,11 +15,12 @@ Recomendações de instalação
 * Fechar o Sublime antes de clonar este repositório
 * recomendo fazer backup e remover todas as extensões e arquivos (exceto a pasta User)
 
+---------------------------------------
+
 ### FrontEnd Installed Packages
 - Alignment
 - AutoFileNAme
 - Can I Use
-- Chrome Apps and Extensions
 - Code Alignment
 - Codeigniter Codeintel Helper
 - CodeIgniter Snippets

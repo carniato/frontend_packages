@@ -1,0 +1,47 @@
+# Sublime Text 2
+
+## Rick Installed Packages
+
+- Additional PHP Snippets
+- Alignment
+- AlignTab
+- AutoFileNAme
+- Base64 Fold
+- Can I Use
+- Chrome Apps and Extensions
+- Code Alignment
+- Codeigniter Codeintel Helper
+- CodeIgniter Snippets
+- CodeIgniter Utilities
+- Color Picker
+- Comment-Snippets
+- CSS Less(ish)
+- CSS Snippets
+- CSSFormat
+- Emmet
+- Gist
+- Github Tools
+- Google Clousure Library snippets
+- HTML
+- HTML5
+- HTMLAttributes
+- jQuery
+- jQuery Snippets pack
+- JsFormat
+- JsMinifier
+- LESS
+- LESS-build
+- Magento - TemplateCopy
+- MagentoIntel
+- Package Control
+- Placeholders
+- Prefixr
+- Pretty JSON
+- RickSnippets
+- SideBarEnhancements
+- SideBarGit
+- SQL
+- Sublime-HTMLPrettify
+- SublimeTextGitX
+- Theme - Nexus
+- Theme - Phoenix

@@ -1,0 +1,121 @@
+<snippet>
+    <content><![CDATA[
+<!doctype html>
+<html lang="pt-br">
+<head>
+
+     <meta charset="utf-8">
+
+     <title>${1:Nome da Página}  - ${2:Nome do Site}</title>
+
+     <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+     <meta name="viewport" content="width=device-width,initial-scale=1">
+     <meta name="author" content="${3:Nome do Autor}">
+
+     <!-- Style -->
+     <link rel="stylesheet" type="text/css" href="style.css" media="all">
+
+     <!-- IE Fix for HTML5 Tags -->
+     <!--[if lt IE 9]>
+          <meta http-equiv="cleartype" content="on">
+          <link rel="ies"  href='css/ie.css" type="text/css" media="all" />
+          <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+     <![endif]-->
+     <!--[if gte IE 9]>
+          <style type="text/css">
+               .gradient { filter: none !important; }
+          </style>
+     <![endif]-->
+
+     <!-- Favicon and Feed -->
+     <link rel="shortcut icon" type="image/png" href="favicon.png">
+     <link rel="alternate" type="application/rss+xml" title="Nome do site Feed" href="http://dominio.com/feed/">
+
+     <!--  iPhone Web App Home Screen Icon -->
+     <link rel="apple-touch-icon" sizes="72x72" href="images/devices/icon-ipad.png" />
+     <link rel="apple-touch-icon" sizes="114x114" href="images/devices/icon-retina.png" />
+     <link rel="apple-touch-icon" href="images/devices/icon.png" />
+
+     <!-- Enable Startup Image for iOS Home Screen Web App -->
+     <meta name="apple-mobile-web-app-capable" content="yes" />
+     <link rel="apple-touch-startup-image" href="images/devices/load.png" />
+
+     <!-- Startup Image iPad Landscape (748x1024) -->
+     <link rel="apple-touch-startup-image" href="images/devices/load-ipad-landscape.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
+     <!-- Startup Image iPad Portrait (768x1004) -->
+     <link rel="apple-touch-startup-image" href="images/devices/load-ipad-portrait.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
+     <!-- Startup Image iPhone (320x460) -->
+     <link rel="apple-touch-startup-image" href="images/devices/load.png" media="screen and (max-device-width: 320px)" />
+
+</head>
+<body class="home">
+     <nav role="navigation" id="menu-topo">
+          <div class="limite">
+               <ul>
+                    li[href=#][title=Title]{Title}*3
+               </ul>
+               <a href="#main" title="Pular para o conteúdo" class="fr lnk acessibilidade">Pular para o conteúdo</a>
+          </div>
+     </nav>
+     <header id="site-header">
+          <div class="limite">
+               <a href="#" title="Logo" class="logo">
+                    <img src="images/logo.png" alt="Logo">
+               </a>
+
+          </div>
+     </header>
+     <nav role="navigation" id="menu-principal">
+          <div class="limite">
+               <ul>
+                    li[href=#][title="Teste"]{Teste}*3
+               </ul>
+          </div>
+     </nav>
+     <main role="content">
+          <div class="limit">
+               <section class="post">
+                    <header>
+                         <h1>Título da Página</h1>
+                    </header>
+                    <article class="entry-content">
+                         <p>80 days around the world, we'll find a pot of gold just sitting where the rainbow's ending. Time - we'll fight against the time, and we'll fly on the white wings of the wind. 80 days around the world, no we won't say a word before the ship is really back. Round, round, all around the world. Round, all around the world. Round, all around the world. Round, all around the world.</p>
+
+                         <p>There's a voice that keeps on calling me. Down the road, that's where I'll always be. Every stop I make, I make a new friend. Can't stay for long, just turn around and I'm gone again. Maybe tomorrow, I'll want to settle down, Until tomorrow, I'll just keep moving on.</p>
+
+                         <p>Ten years ago a crack commando unit was sent to prison by a military court for a crime they didn't commit. These men promptly escaped from a maximum security stockade to the Los Angeles underground. Today, still wanted by the government, they survive as soldiers of fortune. If you have a problem and no one else can help, and if you can find them, maybe you can hire the A-team.</p>
+                    </article>
+                    <footer>
+                         <p>Tags: a[href=#][title=Teste]{Teste}*3
+                    </footer>
+               </section>
+               <aside>
+                   <section class="widgets">
+                       <h3>Título do widget</h3>
+                       <div class="widget-content">
+                         <p>Conteúdo do widget aqui</p>
+                       </div>
+                   </section>
+               </aside>
+          </div>
+     </main>
+
+     <footer id="site-footer">
+          <div class="limit">
+               <nav role="navigation" class="menu-footer">
+                    <ul>
+                         li[href=#][title="Teste"]{Teste}*3
+                    </ul>
+               </nav>
+           </div>
+     </footer>
+
+     <!-- Scripts -->
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js></script>
+</body>
+</html>
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>starthtml</tabTrigger>
+    <!-- <scope>source.html,source.phtml</scope> -->
+</snippet>

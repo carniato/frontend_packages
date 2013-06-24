@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 
 import re
+import imp
 import json
 import sys
 import os.path
@@ -16,7 +17,7 @@ sys.path += [BASE_PATH] + [os.path.join(BASE_PATH, f) for f in ['emmet_completio
 
 # Make sure all dependencies are reloaded on upgrade
 if 'emmet.reloader' in sys.modules:
-	reload(sys.modules['emmet.reloader'])
+	imp.reload(sys.modules['emmet.reloader'])
 import emmet.reloader
 
 # import completions as cmpl
@@ -124,6 +125,9 @@ class SublimeLoaderDelegate(LoaderDelegate):
 		self.state = 'loading'
 
 	def on_progress(self, *args, **kwargs):
+		if kwargs['progress'].is_background:
+			return
+
 		before = self.i % self.size
 		after = (self.size - 1) - before
 		msg = '%s [%s=%s]' % (self.message, ' ' * before, ' ' * after)
@@ -137,6 +141,10 @@ class SublimeLoaderDelegate(LoaderDelegate):
 
 	def on_complete(self, *args, **kwargs):
 		self.state = 'complete'
+
+		if kwargs['progress'].is_background:
+			return
+
 		sublime.set_timeout(lambda: sublime.status_message('PyV8 binary successfully loaded'), 0)
 
 	def on_error(self, exit_code=-1, thread=None):
@@ -261,25 +269,31 @@ def should_handle_tab_key(syntax=None):
 	if not scopes or not sublime.score_selector(cur_scope, scopes):
 		return True
 
-	abbr = ctx.js().locals.pyExtractAbbreviation()
-	if not re.match(r'^[\w\:%]+$', abbr):
-		# it's a complex expression
-		return True
+	with ctx.js() as c:
+		abbr = c.locals.pyExtractAbbreviation()
 
-	if re.match(r'^(lorem|lipsum)\d*$', abbr):
-		# hardcoded Lorem Ipsum generator
-		return True
+		disabled_snippets = settings.get('disabled_single_snippets', '').split()
+		if disabled_snippets and abbr in disabled_snippets:
+			return False
 
-	# detect inline CSS
-	if syntax is None:
-		syntax = ctx.js().locals.pyGetSyntax();
+		if not re.match(r'^[\w\-\:%]+$', abbr):
+			# it's a complex expression
+			return True
 
-	if syntax == 'css':
-		return True
+		if re.match(r'^(lorem|lipsum)([a-z]{2})?\d*$', abbr, re.I):
+			# hardcoded Lorem Ipsum generator
+			return True
 
-	known_tags = settings.get('known_html_tags', '').split()
-	if abbr in known_tags or ctx.js().locals.pyHasSnippet(abbr):
-		return True
+		# detect inline CSS
+		if syntax is None:
+			syntax = c.locals.pyGetSyntax();
+
+		if syntax == 'css':
+			return True
+
+		known_tags = settings.get('known_html_tags', '').split()
+		if abbr in known_tags or c.locals.pyHasSnippet(abbr):
+			return True
 
 	return False
 
@@ -287,10 +301,15 @@ def log(message):
 	if settings.get('debug', False):
 		print('Emmet: %s' % message)
 
+def action_factory(name):
+	def _action(i, sel):
+			with ctx.js() as c:
+				return c.locals.pyRunAction(name)
+	return _action
+
 class RunEmmetAction(sublime_plugin.TextCommand):
 	def run(self, edit, action=None, **kw):
-		run_action(lambda i, sel: ctx.js().locals.pyRunAction(action))
-		# ctx.js().locals.pyRunAction(action)
+		run_action(action_factory(action))
 
 class ActionContextHandler(sublime_plugin.EventListener):
 	def on_query_context(self, view, key, op, operand, match_all):
@@ -325,7 +344,6 @@ def run_action(action, view=None):
 
 	region_key = '__emmet__'
 	sels = list(view.sel())
-	r = ctx.js().locals.pyRunAction
 	result = False
 
 	# edit = get_edit(view, edit_token)
@@ -400,7 +418,9 @@ class TabAndCompletionsHandler():
 		if not check_context():
 			return False;
 			
-		syntax = ctx.js().locals.pyGetSyntax();
+		with ctx.js() as c:
+			syntax = str(c.locals.pyGetSyntax());
+		
 		if not should_handle_tab_key(syntax):
 			return False
 
@@ -425,8 +445,7 @@ class TabAndCompletionsHandler():
 		if banned_regexp and re.search(banned_regexp, cur_scope):
 			return None
 		
-		return run_action(lambda i, sel: ctx.js().locals.pyRunAction('expand_abbreviation'))
-		
+		return run_action(action_factory('expand_abbreviation'))
 		# view.run_command('run_emmet_action',
 		# 						{'action':'expand_abbreviation'})
 
@@ -461,10 +480,11 @@ class TabExpandHandler(sublime_plugin.EventListener):
 		if view.match_selector(locations[0], settings.get('css_completions_scope', '')) and check_context():
 			l = []
 			if settings.get('show_css_completions', False):
-				completions = ctx.js().locals.pyGetCSSCompletions()
-				if completions:
-					for p in completions:
-						l.append(('%s\t%s' % (p['k'], p['label']), p['v']))
+				with ctx.js() as c:
+					completions = c.locals.pyGetCSSCompletions()
+					if completions:
+						for p in completions:
+							l.append(('%s\t%s' % (p['k'], p['label']), p['v']))
 
 			if not l:
 				return []
@@ -585,11 +605,12 @@ class WrapAsYouType(CommandsAsYouTypeBase):
 		if len(view.sel()) == 1:
 			# capture wrapping context (parent HTML element) 
 			# if there is only one selection
-			r = ctx.js().locals.pyCaptureWrappingRange()
-			if r:
-				view.sel().clear()
-				view.sel().add(sublime.Region(r[0], r[1]))
-				view.show(view.sel())
+			with ctx.js() as c: 
+				r = c.locals.pyCaptureWrappingRange()
+				if r:
+					view.sel().clear()
+					view.sel().add(sublime.Region(r[0], r[1]))
+					view.show(view.sel())
 
 		self.remember_sels(view)
 
@@ -608,7 +629,8 @@ class WrapAsYouType(CommandsAsYouTypeBase):
 
 		def ins(i, sel):
 			try:
-				self._prev_output = ctx.js().locals.pyWrapAsYouType(abbr, self._sel_items[i])
+				with ctx.js() as c:
+					self._prev_output = c.locals.pyWrapAsYouType(abbr, self._sel_items[i])
 				# self.run_command(view, output)
 			except Exception:
 				"dont litter the console"
@@ -659,16 +681,17 @@ class RenameTag(sublime_plugin.TextCommand):
 		view = active_view()
 		sels = list(view.sel())
 		sel_cleared = False
-		for s in sels:
-			ranges = ctx.js().locals.pyGetTagNameRanges(s.begin())
-			if ranges:
-				if not sel_cleared:
-					view.sel().clear()
-					sel_cleared = True
-					
-				for r in ranges:
-					view.sel().add(sublime.Region(r[0], r[1]))
-				view.show(view.sel())
+		with ctx.js() as c:
+			for s in sels:
+				ranges = c.locals.pyGetTagNameRanges(s.begin())
+				if ranges:
+					if not sel_cleared:
+						view.sel().clear()
+						sel_cleared = True
+						
+					for r in ranges:
+						view.sel().add(sublime.Region(r[0], r[1]))
+					view.show(view.sel())
 
 class EmmetInsertAttribute(sublime_plugin.TextCommand):
 	def run(self, edit, attribute=None, **kw):
